@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="purchase_order_efcmd_template" inherit_id="purchase.report_purchaseorder_document">
+            <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+                <t t-call="purchase_extend.purchase_order_layout">
+                    <div class="page">
+                        <br/><br/>
+                        <div style="line-height:40%;font-size:14px;">
+                            <p><u>FOURNISSEUR:</u></p>
+                            <p style="margin-left:15px;font-weight:bold;"><span t-field="o.partner_id.name"/></p>
+                        </div>
+                        <table style="width:70%;margin-top:-15px;">
+                            <tr>
+                                <td style="width:100%;font-size:14px;">
+                                    <p style="margin-left:15px;">ADRESSE : <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/></p>
+                                    <p style="margin-left:85px;"><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></p>
+                                    <p style="margin-left:15px;"><span style="margin-right:45px;">ICE</span>: <span t-field="o.partner_id.vat"/></p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <br/><br/>
+
+                            <table style="width:100%;" class="table table-sm o_main_table">
+
+                                <thead>
+
+                                    <tr style="text-align:center;font-size: 14px;background-color:#e2e7e5;">
+                                        <th style="width:2%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">N°</th>
+                                        <th style="width:37%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">DÉSIGNATiON</th>
+                                        <th t-if="o.is_show_cataloge" style="width:11%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">CATALOGUE</th>
+                                        <th style="width:10%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">REF</th>
+                                        <th style="width:6%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">QTÉ</th>
+                                        <th style="width:18%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">PRIX UNITAIRE (HT)</th>
+                                        <th style="width:16%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">PRIX TOTAL (HT)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="purchase_tbody">
+                                    <t t-set="current_subtotal" t-value="0"/>
+                                    <t t-set="num" t-value="0"/>
+                                    <t t-foreach="o.order_line" t-as="line">
+                                        <t t-set="num" t-value="num + 1"/>
+                                        <tr style="font-size: 14px;" >
+                                            <t t-if="not line.display_type">
+                                                <td style="border-left: 1pt solid black;border-bottom: 1pt solid black;border-top: 1pt solid black;text-align:left;padding-left:5px;">
+                                                    <b><span t-esc="num"/></b>
+                                                </td>
+                                                <td style="border-left: 1pt solid black;border-top: 1pt solid black;text-align:left;padding-left:5px;">
+                                                    <b><span t-field="line.name"/></b>
+                                                </td>
+                                                <td t-if="o.is_show_cataloge" style="border-left: 1pt solid black;border-top: 1pt solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.product_id.brand_id.name"/></b>
+                                                </td>
+                                                <td style="border-left: 1pt solid black;border-top: 1pt solid black;text-align:right;padding-right:5px;">
+                                                        <b><span t-field="line.product_id.default_code"/></b>
+                                                </td>
+                                                <td style="border: 1pt solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.product_qty"/></b>
+                                                </td>
+                                                <td style="border: 1pt solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.price_unit"/></b>
+                                                </td>
+                                                <td style="border: 1pt solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.price_subtotal"/></b>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                    <tr style="font-size: 14px;">
+                                        <td colspan="99" style="border-top: 1pt solid black;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        <div class="clearfix" name="so_total_summary" style="font-size:15px;">
+                            <div id="total" class="row" name="total">
+                                <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
+                                    <table class="table table-sm" style="width:65%;" align="right">
+                                        <tr class="border-black o_subtotal">
+                                            <td>Total H.T:</td>
+                                            <td class="text-right">
+                                                <span style="text-align:right;" t-field="o.amount_untaxed"
+                                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-black o_subtotal">
+                                            <td>TVA:</td>
+                                            <td class="text-right">
+                                                <span style="text-align:right;" t-field="o.amount_tax"
+                                                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-black o_subtotal">
+                                            <td>Total T.T.C:</td>
+                                            <td class="text-right">
+                                                <span style="text-align:right;" t-field="o.amount_total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </xpath>
+        </template>
+
+
+
+
+    </data>
+</odoo>

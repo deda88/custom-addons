@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_picking_efcmd" inherit_id="stock.report_delivery_document">
+
+        <xpath expr="//t[@t-call='web.html_container']" position="replace">
+            <t t-call="web.html_container">
+                <t t-call="sale_extend.external_layout_picking">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
+                <t t-set="partner" t-value="o.partner_id or (o.move_lines and o.move_lines[0].partner_id) or False"/>
+
+
+                <div class="page">
+                    <br/><br/><br/><br/>
+                    <table style="width:100%;margin-top:-25px;">
+                        <tr>
+                            <td style="width:48%; line-height:50%; font-size:14px; padding:20px; border-left: 0.05em solid black; border-right: 0.05em solid black;border-top: 0.05em solid black;border-bottom: 0.05em solid black;">
+                                    <p style="font-weight:bold;font-size:16px;">EFCMD</p>
+                                    <p t-if="o.company_id.phone"><b>Tél : </b><span t-field="o.company_id.phone"/></p>
+                                    <p t-if="o.company_id.mobile"><b>Mobile : </b><span t-field="o.company_id.mobile"/></p>
+                                    <p t-if="o.company_id.email"><b>Email : </b><span t-field="o.company_id.email"/></p>
+                            </td>
+                            <td style="width:4%">
+                            </td>
+                            <td  style="width:48%; padding:20px; background-color: #F7F7F8;">
+                                <div style="line-height:50%;font-size:14px;">
+                                    <p><b>Adressé à :</b></p>
+                                    <p style="margin-left:15px;margin-top: 10px; font-weight:bold;font-size:16px;"><span t-field="o.partner_id.name"/></p>
+                                </div>
+                                    <t t-if="o.partner_id.street"> <p style="margin-left:15px;"><span style="line-height: 18px !important;" t-field="o.partner_id.street"/></p> </t>
+                                    <p style="margin-left:15px;"><span t-field="o.partner_id.street2"/></p>
+                                    <p style="margin-left:15px;"><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></p>
+                                    <t t-if="o.partner_id.vat"><p style="margin-left:15px;"><span style="margin-right:45px;"><b>ICE : </b></span><span t-field="o.partner_id.vat"/></p></t>
+                                  
+                            </td>
+                        </tr>
+                    </table>
+                    <br/><br/>
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr  style="text-align:center;font-size: 14px;background-color:#e2e7e5;">
+                                <th name="th_num" style="width:2%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">
+                                    <strong>N°</strong>
+                                </th>
+                                <th name="th_product" style="width:37%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">
+                                    <strong>Désignation</strong>
+                                </th>
+                                <t t-if="o.is_show_cataloge">
+                                    <th name="th_ref_cat" style="width:16%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">
+                                        <strong>Réf/ Catalogue</strong>
+                                    </th>
+                                </t>
+                                <th name="th_qty" style="width:16%;border-left: 1pt solid black;border-right: 1pt solid black;border-bottom: 1pt solid black;border-top: 2pt solid orange;">
+                                    <strong>Qté</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="num" t-value="0"/>
+                            <t t-foreach="o.move_ids_without_package" t-as="line">
+                                <tr style="font-size: 14px;" >
+                                    <t t-set="num" t-value="num + 1"/>
+                                    <td style="border-left: 1pt solid black;border-bottom: 1pt solid black;border-top: 1pt solid black;text-align:left;padding-left:5px;">
+                                        <b><span t-esc="num"/></b>
+                                    </td>
+                                    <td style="border-left: 1pt solid black;border-top: 1pt solid black;border-bottom: 1pt solid black;text-align:left;padding-left:5px;">
+                                        <b><span t-field="line.product_id.name"/></b>
+                                    </td>
+                                    <t t-if="o.is_show_cataloge">
+                                        <td style="border-left: 1pt solid black;border-top: 1pt solid black;border-bottom: 1pt solid black;text-align:left;padding-left:5px;">
+                                            <b><span t-field="line.product_id.default_code"/>/<span t-field="line.product_id.brand_id.name"/></b>
+                                        </td>
+                                    </t>
+                                    <td style="border: 1pt solid black;text-align:right;padding-right:5px;">
+                                        <b><span t-field="line.quantity_done"/></b>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+             </t>
+        </xpath>
+
+    </template>
+
+    <record id="stock.action_report_picking" model="ir.actions.report">
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <record id="report_efcm_picking_format" model="report.paperformat">
+        <field name="name">A4 BL</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">35</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">2</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="True"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="stock.action_report_delivery" model="ir.actions.report">
+        <field name="paperformat_id" ref="sale_extend.report_efcm_picking_format"/>
+    </record>
+
+</odoo>

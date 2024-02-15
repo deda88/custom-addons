@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_calculate_formula_wizard,sale_extend.calculate_formula_wizard,model_calculate_formula_wizard,base.group_user,1,1,1,1
+access_sale_line_pack_products,sale_extend.sale_line_pack_products,model_sale_line_pack_products,base.group_user,1,1,1,1
+access_sale_order_formule,sale_extend.sale_order_formule,model_sale_order_formule,base.group_user,1,1,1,1

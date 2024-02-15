@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_agora" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-call="sale_extend.external_layout_sale">
+                <div class="page">
+                    <br/><br/>
+                    <table style="width:100%;margin-top:-25px;">
+                        <tr>
+                            <td style="width:48%; line-height:50%; font-size:14px; padding:20px; border-left: 0.05em solid black; border-right: 0.05em solid black;border-top: 0.05em solid black;border-bottom: 0.05em solid black;">
+                                    <p style="font-weight:bold;font-size:16px;">EFCMD</p>
+                                    <p t-if="doc.company_id.phone"><b>Tél : </b><span t-field="doc.company_id.phone"/></p>
+                                    <p t-if="doc.company_id.mobile"><b>Mobile : </b><span t-field="doc.company_id.mobile"/></p>
+                                    <p t-if="doc.company_id.email"><b>Email : </b><span t-field="doc.company_id.email"/></p>
+                            </td>
+                            <td style="width:4%">
+                            </td>
+                            <td  style="width:48%; padding:20px; background-color: #F7F7F8;">
+                                <div style="line-height:50%;font-size:14px;">
+                                    <p><b>CLIENT :</b></p>
+                                    <p style="margin-left:15px;margin-top: 10px; font-weight:bold;font-size:16px;"><span t-field="doc.partner_id.name"/></p>
+                                </div>
+                                    <t t-if="doc.partner_id.street"> <p style="margin-left:15px;"><span style="line-height: 18px !important;" t-field="doc.partner_id.street"/></p> </t>
+                                    <p style="margin-left:15px;"><span t-field="doc.partner_id.street2"/></p>
+                                    <p style="margin-left:15px;"><span t-field="doc.partner_id.zip"/> <span t-field="doc.partner_id.city"/></p>
+                                    <t t-if="doc.partner_id.vat"><p style="margin-left:15px;"><span style="margin-right:45px;"><b>ICE : </b></span><span t-field="doc.partner_id.vat"/></p></t>
+                                  
+                            </td>
+                        </tr>
+                    </table>
+
+                    <br/><br/>
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="width:80%; font-size:14px;">
+                                <t t-if="not (env.context.get('proforma', False) or is_pro_forma) and doc.object">
+                                    <p><b>OBJET: <span t-field="doc.object"/></b></p>
+                                </t>
+                            </td>
+                            
+                        </tr>
+                    </table>
+
+                    <br/>
+
+                    <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+                        <table style="width:100%; max-height=500px !important" class="table table-sm o_main_table">
+
+                            <thead>
+
+                                <tr style="text-align:center;font-size: 14px;background-color:#F7F7F8;">
+                                    <th style="width:2%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: thin solid black;border-top: 0.08em solid orange;">N°</th>
+                                    <th style="width:37%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: thin solid black;border-top: 0.08em solid orange;">DÉSIGNATiON</th>
+                                    <th t-if="doc.is_show_cataloge" style="width:13%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: thin solid black;border-top: 0.08em solid orange;">CATALOGUE</th>
+                                    <th style="width:10%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: thin solid black;border-top: 0.08em solid orange;">REF</th>
+                                    <th style="width:6%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 0.08em solid orange;">QTÉ</th>
+                                    <th style="width:16%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 0.08em solid orange;">PRIX UNITAIRE (HT)</th>
+                                    <th style="width:16%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 0.08em solid orange;">PRIX TOTAL (HT)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sale_tbody">
+                                <t t-set="current_subtotal" t-value="0"/>
+                                <t t-set="num" t-value="0"/>
+                                <t t-foreach="doc.order_line" t-as="line">
+                                    <t t-set="num" t-value="num + 1"/>
+                                    <t t-if="line.is_pack">
+                                        <t t-if="line.type_show_in_report=='1'">
+                                            <tr style="font-size: 14px;">
+                                                <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: none;border-bottom: none;;text-align:left;padding-left:5px;"></td>
+                                                <t t-if="doc.is_show_cataloge">
+                                                    <td colspan="7" style="border-top: 0.05em solid black;border-right: 0.05em solid black;">
+                                                        <b><span t-field="line.product_id.name"/> composé de:</b>
+                                                    </td>
+                                                </t>
+                                                <t t-else="">
+                                                    <td  colspan="6" style="border-top: 0.05em solid black;border-right: 0.05em solid black;">
+                                                        <b><span t-field="line.product_id.name"/> composé de:</b>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                            <t t-set="num_pack" t-value="0"/>
+                                            <t t-foreach="line.product_pack_ids" t-as="pack">
+                                                <t t-set="num_pack" t-value="num_pack + 1"/>
+                                                <tr style="font-size: 14px;" >
+                                                    <t t-if="not line.display_type">
+                                                        <t t-if="len(line.product_pack_ids) == num_pack">
+                                                            <td style="border-left: 0.05em solid black;border-top: none;border-bottom: 0.05em solid black;;text-align:left;padding-left:5px;"></td>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <td style="border-left: 0.05em solid black;border-top: none;text-align:left;padding-left:5px;">
+                                                                <t t-if="len(line.product_pack_ids)/2 == num_pack">
+                                                                    <b><span t-esc="num"/></b>
+                                                                </t>
+                                                            </td>
+                                                        </t>
+
+                                                        <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:left;padding-left:5px;">
+                                                            <span t-field="pack.quantity"/> <span t-field="pack.product_id.name"/>
+                                                        </td>
+                                                        <td t-if="doc.is_show_cataloge" style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="line.product_id.brand_id.name"/>
+                                                        </td>
+                                                        <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="pack.product_id.default_code"/>
+                                                        </td>
+                                                        <t t-if="len(line.product_pack_ids) == num_pack">
+                                                            <td style="border-left: 0.05em solid black;border-top: none;border-bottom: 0.05em solid black;text-align:left;padding-left:5px;"></td>
+                                                            <td style="border-left: 0.05em solid black;border-top: none;border-bottom: 0.05em solid black;text-align:left;padding-left:5px;"></td>
+                                                            <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: none;border-bottom: 0.05em solid black;text-align:left;padding-left:5px;"></td>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: none;text-align:right;padding-right:5px;">
+                                                                <t t-if="len(line.product_pack_ids)/2 == num_pack">
+                                                                    <b><span t-field="line.product_uom_qty"/></b>
+                                                                </t>
+                                                            </td>
+                                                            <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: none;text-align:right;padding-right:5px;">
+                                                                <t t-if="len(line.product_pack_ids)/2 == num_pack">
+                                                                    <b><span t-field="line.price_unit"/></b>
+                                                                </t>
+                                                            </td>
+                                                            <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: none;text-align:right;padding-right:5px;">
+                                                                <t t-if="len(line.product_pack_ids)/2 == num_pack">
+                                                                    <b><span t-field="line.price_subtotal"/></b>
+                                                                </t>
+                                                            </td>
+                                                        </t>
+                                                    </t>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-elif="line.type_show_in_report=='2'">
+                                            <tr style="font-size: 14px;">
+                                                <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: none;border-bottom: none;;text-align:left;padding-left:5px;"></td>
+                                                <td style="border-top: 0.05em solid black;border-right: 0.05em solid black;">
+                                                    <b><span t-field="line.product_id.name"/> composé de:</b>
+                                                </td>
+                                                <td t-if="doc.is_show_cataloge" style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.brand"/></b>
+                                                </td>
+                                                <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.ref_product"/></b>
+                                                </td>
+                                                <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                </td>
+                                                <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                </td>
+                                                <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                </td>
+                                            </tr>
+                                            <t t-set="num_pack" t-value="0"/>
+                                            <t t-foreach="line.product_pack_ids" t-as="pack">
+                                                <t t-set="num_pack" t-value="num_pack + 1"/>
+                                                <tr style="font-size: 14px;" >
+                                                    <t t-if="not line.display_type">
+                                                        <t t-if="len(line.product_pack_ids) == num_pack">
+                                                            <td style="border-left: 0.05em solid black;border-top: none;border-bottom: 0.05em solid black;;text-align:left;padding-left:5px;"></td>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <td style="border-left: 0.05em solid black;border-top: none;text-align:left;padding-left:5px;">
+                                                                <t t-if="len(line.product_pack_ids)/2 == num_pack">
+                                                                    <b><span t-esc="num"/></b>
+                                                                </t>
+                                                            </td>
+                                                        </t>
+
+                                                        <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:left;padding-left:5px;">
+                                                            <span t-field="pack.product_id.name"/>
+                                                        </td>
+                                                        <td t-if="doc.is_show_cataloge" style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="pack.product_id.brand_id.name"/>
+                                                        </td>
+                                                        <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="pack.product_id.default_code"/>
+                                                        </td>
+                                                        <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="pack.quantity"/>
+                                                        </td>
+                                                        <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="pack.price"/>
+                                                        </td>
+                                                        <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <span t-field="pack.total_price"/>
+                                                        </td>
+                                                    </t>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr style="font-size: 14px;" >
+                                                <t t-if="not line.display_type">
+                                                    <td style="border-left: 0.05em solid black;border-bottom: none;text-align:center;padding-left:5px;">
+                                                        <b><span t-esc="num"/></b>
+                                                    </td>
+                                                    <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:left;padding-left:5px;">
+                                                        <b><span t-field="line.name"/></b>
+                                                    </td>
+                                                    <td t-if="doc.is_show_cataloge" tyle="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                        <b><span t-field="line.brand"/></b>
+                                                    </td>
+                                                    <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                            <b><span t-field="line.ref_product"/></b>
+                                                    </td>
+                                                    <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:center;padding-right:5px;">
+                                                        <b><span t-field="line.product_uom_qty"/></b>
+                                                    </td>
+                                                    <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                        <b><span t-field="line.price_unit"/></b>
+                                                    </td>
+                                                    <td style="border-left: 0.05em solid black;border-right: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                        <b><span t-field="line.price_subtotal"/></b>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr style="font-size: 14px;" >
+                                        <t t-if="not line.display_type">
+                                            <td style="border-left: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 0.05em solid black;text-align:center;padding-left:5px;">
+                                                <b><span t-esc="num"/></b>
+                                            </td>
+                                            <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:left;padding-left:5px;">
+                                                <b><span t-field="line.name"/></b>
+                                            </td>
+                                            <td t-if="doc.is_show_cataloge" style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                <b><span t-field="line.brand"/></b>
+                                            </td>
+                                            <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.ref_product"/></b>
+                                            </td>
+                                            <td style="border: 0.05em solid black;text-align:center;padding-right:5px;">
+                                                <t t-set="qty" t-value="line.get_qty_report()"/>
+                                                <b><t t-esc="qty"/></b>
+                                            </td>
+                                            <td style="border: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                <b><span t-field="line.price_unit"/></b>
+                                            </td>
+                                            <td style="border: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                <b><span t-field="line.price_subtotal"/></b>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                    </t>
+                                </t>
+                                <tr style="font-size: 14px;">
+                                    <td colspan="99" style="border-top: 0.05em solid black;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                    <t t-if="env.context.get('proforma', False) or is_pro_forma">
+                        <table style="width:100%;" class="table table-sm o_main_table">
+                            <thead>
+                                <tr style="text-align:center;font-size: 14px;background-color:#e2e7e5;">
+                                    <th style="width:2%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">N°</th>
+                                    <th style="width:37%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">DÉSIGNATION</th>
+                                    <th t-if="doc.is_show_cataloge" style="width:13%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">CATALOGUE</th>
+                                    <th style="width:8%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">REF</th>
+                                    <th style="width:6%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">QTÉ</th>
+                                    <th style="width:18%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">PRIX UNITAIRE (HT)</th>
+                                    <th style="width:16%;border-left: 0.05em solid black;border-right: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 2pt solid orange;">PRIX TOTAL (HT)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sale_tbody">
+                                <t t-set="current_subtotal" t-value="0"/>
+                                <t t-set="num" t-value="0"/>
+                                <t t-foreach="doc.order_line" t-as="line">
+                                    <t t-set="num" t-value="num + 1"/>
+                                    <tr style="font-size: 14px;" >
+                                        <t t-if="not line.display_type">
+                                                <td style="border-left: 0.05em solid black;border-bottom: 0.05em solid black;border-top: 0.05em solid black;text-align:left;padding-left:5px;">
+                                                    <b><span t-esc="num"/></b>
+                                                </td>
+                                                <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:left;padding-left:5px;">
+                                                    <b><span t-field="line.product_id.name"/></b>
+                                                </td>
+                                                <td t-if="doc.is_show_cataloge" style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.brand"/></b>
+                                                </td>
+                                                <td style="border-left: 0.05em solid black;border-top: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                        <b><span t-field="line.ref_product"/></b>
+                                                </td>
+                                                <td style="border: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.product_uom_qty"/></b>
+                                                </td>
+                                                <td style="border: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.price_unit"/></b>
+                                                </td>
+                                                <td style="border: 0.05em solid black;text-align:right;padding-right:5px;">
+                                                    <b><span t-field="line.price_subtotal"/></b>
+                                                </td>
+                                            </t>
+                                    </tr>
+                                </t>
+                                <tr style="font-size: 14px;">
+                                    <td colspan="99" style="border-top: 0.05em solid black;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                    <div class="clearfix" name="so_total_summary" style="font-size:15px;">
+                        <div id="total" class="row" name="total">
+                            <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
+                                <table class="table table-sm" style="width:65%;" align="right">
+                                    <tr class="border-black o_subtotal">
+                                        <td>Total H.T:</td>
+                                        <td class="text-right">
+                                            <span style="text-align:right;" t-field="doc.amount_untaxed"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_subtotal">
+                                        <td>TVA:</td>
+                                        <td class="text-right">
+                                            <span style="text-align:right;" t-field="doc.amount_tax"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_subtotal">
+                                        <td>Total T.T.C:</td>
+                                        <td class="text-right">
+                                            <span style="text-align:right;" t-field="doc.amount_total"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br/>
+                    <br/>
+                    <p style="font-size:14px;">Arrêté le présent devis à la somme de: <b><span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/></b> Toutes Taxes Comprises</p>
+                    <p t-if="doc.payment_term_id" style="font-size:14px;">MODALITÉS DE PAIEMENT:  <b><span t-esc="doc.payment_term_id.name"/></b> </p>
+                    <p t-if="doc.note" style="font-size:14px;">  <b><span t-esc="doc.note"/></b> </p>
+                
+                </div>
+            </t>
+        </xpath>
+
+    </template>
+
+    <record id="report_sale_devis_format" model="report.paperformat">
+        <field name="name">A4 devis vente</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">35</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">2</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="True"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
+        <field name="paperformat_id" ref="sale_extend.report_sale_devis_format"/>
+    </record>
+
+
+</odoo>

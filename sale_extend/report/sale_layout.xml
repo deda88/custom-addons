@@ -1,0 +1,147 @@
+<odoo>
+    <data>
+        <template id="external_layout_sale">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <div class="header">
+                <table style="width:100%;">
+                    <tr>
+                        <br/>
+                        <td style="width:32%;padding:auto;font-size:10px;">
+                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"
+                                 style="max-width:200px;max-height:800px;" alt="logo"/>
+                        </td>
+                         <td style="width:2%">
+                        </td>
+                        
+                        <td style="width:32%; padding:auto; font-size:10px;">
+                            <!-- <br/> -->
+                            <center>
+
+                                <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+                                    <h1 style="font-size:34px;"><b>DEVIS</b></h1>
+                                    <div style="margin-top:-30px;margin-bottom:10px;width:50%;background-color:orange;color:orange;">.</div>
+                                    <h3 style="font-size:26px;">N° <span t-field="doc.name"/></h3>
+                                </t>
+                                <t t-if="env.context.get('proforma', False) or is_pro_forma">
+                                    <h1 style="font-size:24px;"><b>FACTURE PROFORMA</b></h1>
+                                    <div style="margin-top:-23px;margin-bottom:10px;width:100%;background-color:orange;color:orange;">.</div>
+                                    <h3 style="font-size:26px;">N° <span t-field="doc.name"/></h3>
+                                </t>
+                            </center>
+                        </td>
+                        <td style="width:2%">
+                        </td>
+                        <td style="width:32%;line-height: 40%;font-size:14px; vertical-align:top;">
+                            <div style="font-size:14px; width:100%;">
+                                 <t t-if="doc.date_order">
+                                    <p style="padding-left:30px;font-size:14px"><b>Date : </b><span t-esc="doc.date_order.strftime('%d/%m/%Y')"/></p>
+                                </t>
+                                <t t-if="doc.validity_date">
+                                    <p style="padding-left:30px;font-size:14px"><b>Date de validité : </b><span t-esc="doc.validity_date.strftime('%d/%m/%Y')"/></p>
+                                </t>    
+                                <t t-if="doc.ref_request_customer">
+                                    <p style="padding-left:30px;font-size:14px"><b>Vos références : </b><span t-field="doc.ref_request_customer"/></p>
+                                </t>
+                                <t t-if="doc.delivery_locations">
+                                    <p style="padding-left:30px;"><b>Lieu de livraison : </b><span t-field="doc.delivery_locations"/></p> 
+                                </t>
+                                <t t-if="doc.incoterm" >
+                                    <p style="padding-left:30px;"><b>Incoterm : </b><span t-field="doc.incoterm.name"/></p>
+                                </t>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+
+            <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"
+                 t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <!-- <t t-call="web.address_layout"/>-->
+                <t t-raw="0"/>
+            </div>
+
+            <div class="footer">
+                <table style="width:100%;font-weight:bold;">
+                    <tr>
+                        <td style="width:30%;font-size:13px;line-height:15px;">
+                            <p><b> Siège social : </b><span t-if="company.street" t-field="company.street"/>
+                                         <span t-if="company.street2" t-field="company.street2"/> - <span t-if="company.city" t-field="company.city"/>
+                            </p>
+                            <p><b> Succursale : </b>Ennajah, villa 51, secteur 3, 12200 Tamesna
+                            </p>
+                            
+
+                        </td>
+                        <td style="width:32%;border-left:2px solid orange;border-right:2px solid orange;">
+                            <center>
+                                <table style="width:80%;font-size:13px;">
+                                    <tr>
+                                        <td>RC : 87449</td>
+                                        <td style="text-align:right;">T.P : 25930735</td>
+                                    </tr>
+                                    <tr>
+                                        <td>CNSS : 8467509</td>
+                                        <td style="text-align:right;">IF : 40215963</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            ICE : 000021477000084
+                                        </td>
+                                    </tr>
+                                </table>
+                            </center>
+                        </td>
+                        <td style="width:32%;font-size:13px; padding-left:3Opx">
+                            <center>
+                                <p>Crédit du Maroc Rabat-souissi</p>
+                                <p style="margin-top:-10px">RIB : 021810000006903021572136</p>
+                            </center>
+                        </td>
+                        <td style="width:4%;">
+                            <div style="background-color:orange;border-radius: 40%;text-align:center;">
+                                <span class="page"/>/<span class="topage"/>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+<!--            <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">-->
+<!--                <div class="text-center" style="border-top: 1px solid black;">-->
+
+<!--                    <t t-if="page_foot">-->
+<!--                        <div t-if="report_type == 'pdf'" class="text-muted">-->
+<!--                            Page:-->
+<!--                            <span class="page"/>-->
+<!--                            /-->
+<!--                            <span class="topage"/>-->
+<!--                        </div>-->
+<!--                    </t>-->
+<!--                    <div name="financial_infos">-->
+<!--                        <span t-field="company.report_footer"/>-->
+<!--                    </div>-->
+
+<!--                </div>-->
+<!--            </div>-->
+
+
+        </template>
+
+    </data>
+</odoo>
